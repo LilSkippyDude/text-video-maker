@@ -633,7 +633,7 @@ function exportVideo() {
   var exportCtx = exportCanvas.getContext('2d');
   var stream;
   try {
-    stream = exportCanvas.captureStream(30);
+    stream = exportCanvas.captureStream(120);
   } catch (error) {
     status.textContent = 'Export failed: ' + error.message;
     return;
