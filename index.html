@@ -659,19 +659,21 @@ function exportVideo() {
       status.textContent = 'done, video downloaded';
     };
     var duration = totalDuration();
-    var startTime = performance.now();
     recorder.start();
-    status.textContent = 'exporting... may take a minute, feel free to switch to other tabs.';
-    function step(now) {
-      var elapsed = (now - startTime) / 1000;
-      if (elapsed >= duration) {
+    status.textContent = 'exporting... this may take a while depending on length and quality.';
+    var fps = 30;
+    var frameInterval = 1000 / fps;
+    var currentTime = 0;
+    function renderNextFrame() {
+      if (currentTime >= duration) {
         recorder.stop();
         return;
       }
-      drawAtTime(exportCtx, exportCanvas.width, exportCanvas.height, elapsed);
-      requestAnimationFrame(step);
+      drawAtTime(exportCtx, exportCanvas.width, exportCanvas.height, currentTime);
+      currentTime += 1 / fps;
+      setTimeout(renderNextFrame, 0);
     }
-    requestAnimationFrame(step);
+    renderNextFrame();
   }
   if (activeAudioBlob) {
     var audioElement = new Audio(URL.createObjectURL(activeAudioBlob));
