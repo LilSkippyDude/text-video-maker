@@ -664,7 +664,7 @@ function exportVideo() {
   status.textContent = '';
 
   if (typeof MediaRecorder === 'undefined') {
-    status.textContent = 'export failed: this browser does not support video recording';
+    status.textContent = 'export failed: this browser does not support video processing';
     return;
   }
 
@@ -691,7 +691,7 @@ function exportVideo() {
     return;
   }
 
-  function startRecording(finalStream) {
+  function startexporting(finalStream) {
     var recorder;
     try {
       recorder = new MediaRecorder(finalStream, { mimeType: mimeType, videoBitsPerSecond: dims.bitrate });
@@ -715,7 +715,7 @@ function exportVideo() {
     var duration = totalDuration();
     var startTime = performance.now();
     recorder.start();
-    status.textContent = 'recording...';
+    status.textContent = 'exporting...';
 
     function step(now) {
       var elapsed = (now - startTime) / 1000;
@@ -739,9 +739,9 @@ function exportVideo() {
     var finalStream = new MediaStream();
     stream.getVideoTracks().forEach(function(track) { finalStream.addTrack(track); });
     destination.stream.getAudioTracks().forEach(function(track) { finalStream.addTrack(track); });
-    startRecording(finalStream);
+    startexporting(finalStream);
   } else {
-    startRecording(stream);
+    startexporting(stream);
   }
 }
 
