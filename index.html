@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Easy Text Video Maker</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='20,20 80,50 20,80' fill='%230c437b'/%3E%3C/svg%3E" type="image/svg+xml">
 <style>
 body {
   margin: 0;
@@ -182,7 +183,6 @@ select {
 </head>
 <body>
 <canvas id="preview" width="640" height="360"></canvas>
-
 <div id="toolbar">
 <button onclick="playPreview()">play preview</button>
 <button id="aspect169" class="active" onclick="setAspect('16:9')">16:9</button>
@@ -198,22 +198,18 @@ select {
 <button onclick="exportVideo()">export video</button>
 </div>
 <div id="status"></div>
-
 <div id="frames"></div>
 <button onclick="addFrame()">add frame</button>
-
 <script>
 var frames = [
   { text: "your text here", duration: 5, size: 40, fade: 1.25, image: null, imageObj: null }
 ];
-
 var frameList = document.getElementById('frames');
 var canvas = document.getElementById('preview');
 var ctx = canvas.getContext('2d');
 var aspectRatio = '16:9';
 var dragSourceIndex = null;
 var activeAudioBlob = null;
-
 function handleAudioUpload(event) {
   var file = event.target.files[0];
   if (!file) {
@@ -225,7 +221,6 @@ function handleAudioUpload(event) {
     compressAudioLikeOldYoutube(file);
   }
 }
-
 function compressAudioLikeOldYoutube(file) {
   var status = document.getElementById('status');
   status.textContent = 'compressing audio...';
@@ -236,33 +231,26 @@ function compressAudioLikeOldYoutube(file) {
       decodeContext.close();
 var targetRate = 32000;
 var offlineContext = new OfflineAudioContext(1, Math.ceil(buffer.duration * targetRate), targetRate);
-
 var source = offlineContext.createBufferSource();
 source.buffer = buffer;
-
 var highpass = offlineContext.createBiquadFilter();
 highpass.type = "highpass";
 highpass.frequency.value = 90;
-
 var lowpass = offlineContext.createBiquadFilter();
 lowpass.type = "lowpass";
 lowpass.frequency.value = 6800;
 lowpass.Q.value = 0.5;
-
 var compressor = offlineContext.createDynamicsCompressor();
 compressor.threshold.value = -24;
 compressor.knee.value = 20;
 compressor.ratio.value = 4;
 compressor.attack.value = 0.01;
 compressor.release.value = 0.2;
-
 source.connect(highpass);
 highpass.connect(lowpass);
 lowpass.connect(compressor);
 compressor.connect(offlineContext.destination);
-
 source.start();
-
       offlineContext.startRendering().then(function(renderedBuffer) {
         activeAudioBlob = bufferToWavBlob(renderedBuffer);
         status.textContent = 'audio compressed';
@@ -273,18 +261,15 @@ source.start();
   };
   reader.readAsArrayBuffer(file);
 }
-
 function bufferToWavBlob(buffer) {
   var numChannels = buffer.numberOfChannels;
   var sampleRate = buffer.sampleRate;
   var length = buffer.length * numChannels * 2 + 44;
   var arrayBuffer = new ArrayBuffer(length);
   var view = new DataView(arrayBuffer);
-
   function writeString(offset, string) {
     for (var s = 0; s < string.length; s++) view.setUint8(offset + s, string.charCodeAt(s));
   }
-
   writeString(0, 'RIFF');
   view.setUint32(4, length - 8, true);
   writeString(8, 'WAVE');
@@ -298,7 +283,6 @@ function bufferToWavBlob(buffer) {
   view.setUint16(34, 16, true);
   writeString(36, 'data');
   view.setUint32(40, length - 44, true);
-
   var offset = 44;
   for (var i = 0; i < buffer.length; i++) {
     for (var channel = 0; channel < numChannels; channel++) {
@@ -307,10 +291,8 @@ function bufferToWavBlob(buffer) {
       offset += 2;
     }
   }
-
   return new Blob([arrayBuffer], { type: 'audio/wav' });
 }
-
 function renderFrameList() {
   frameList.innerHTML = '';
   for (var i = 0; i < frames.length; i++) {
@@ -335,10 +317,8 @@ function renderFrameList() {
         renderFrameList();
       };
     })(i);
-
     var framehead = document.createElement('div');
     framehead.className = 'framehead';
-
     var handle = document.createElement('div');
     handle.className = 'draghandle';
     handle.draggable = true;
@@ -354,10 +334,8 @@ function renderFrameList() {
       row.classList.remove('dragging');
     };
     framehead.appendChild(handle);
-
     var framecontent = document.createElement('div');
     framecontent.className = 'framecontent';
-
     var textarea = document.createElement('textarea');
     textarea.value = frame.text;
     textarea.oninput = (function(index) {
@@ -366,10 +344,8 @@ function renderFrameList() {
         showFrameLive(index);
       };
     })(i);
-
     var side = document.createElement('div');
     side.className = 'side';
-
     var durationLabel = document.createElement('label');
     durationLabel.textContent = 'duration (seconds)';
     var durationInput = document.createElement('input');
@@ -383,7 +359,6 @@ function renderFrameList() {
         showFrameLive(index);
       };
     })(i);
-
     var sizeLabel = document.createElement('label');
     sizeLabel.textContent = 'font size';
     var sizeInput = document.createElement('input');
@@ -397,7 +372,6 @@ function renderFrameList() {
         showFrameLive(index);
       };
     })(i);
-
     var fadeLabel = document.createElement('label');
     fadeLabel.textContent = 'fade out (seconds)';
     var fadeInput = document.createElement('input');
@@ -411,7 +385,6 @@ function renderFrameList() {
         showFrameLive(index);
       };
     })(i);
-
     var imageLabel = document.createElement('label');
     imageLabel.textContent = 'image';
     var imageBox = document.createElement('div');
@@ -432,7 +405,6 @@ function renderFrameList() {
         }
       };
     })(i);
-
     var uploadLabel = document.createElement('label');
     uploadLabel.className = 'uploadbtn';
     uploadLabel.textContent = 'upload image';
@@ -446,14 +418,12 @@ function renderFrameList() {
       };
     })(i);
     uploadLabel.appendChild(uploadInput);
-
     var removeButton = document.createElement('button');
     removeButton.className = 'small';
     removeButton.textContent = 'remove frame';
     removeButton.onclick = (function(index) {
       return function() { frames.splice(index, 1); renderFrameList(); };
     })(i);
-
     side.appendChild(durationLabel);
     side.appendChild(durationInput);
     side.appendChild(sizeLabel);
@@ -463,7 +433,6 @@ function renderFrameList() {
     side.appendChild(imageLabel);
     side.appendChild(imageBox);
     side.appendChild(uploadLabel);
-
     if (frame.image) {
       var removeImageButton = document.createElement('button');
       removeImageButton.className = 'small';
@@ -478,9 +447,7 @@ function renderFrameList() {
       })(i);
       side.appendChild(removeImageButton);
     }
-
     side.appendChild(removeButton);
-
     row.appendChild(framehead);
     framecontent.appendChild(textarea);
     framecontent.appendChild(side);
@@ -488,7 +455,6 @@ function renderFrameList() {
     frameList.appendChild(row);
   }
 }
-
 function loadImageFile(file, index) {
   var reader = new FileReader();
   reader.onload = function(event) {
@@ -503,12 +469,10 @@ function loadImageFile(file, index) {
   };
   reader.readAsDataURL(file);
 }
-
 function addFrame() {
   frames.push({ text: "new text", duration: 5, size: 40, fade: 1.25, image: null, imageObj: null });
   renderFrameList();
 }
-
 function setAspect(ratio) {
   aspectRatio = ratio;
   canvas.height = ratio === '16:9' ? 360 : 480;
@@ -517,7 +481,6 @@ function setAspect(ratio) {
   document.getElementById('aspect43').className = ratio === '4:3' ? 'active' : '';
   drawAtTime(ctx, canvas.width, canvas.height, 0);
 }
-
 function getExportDimensions(quality, ratio) {
   if (ratio === '16:9') {
     if (quality === '480p') return { width: 854, height: 480, bitrate: 2500000 };
@@ -528,7 +491,6 @@ function getExportDimensions(quality, ratio) {
   if (quality === '1080p') return { width: 1440, height: 1080, bitrate: 7000000 };
   return { width: 960, height: 720, bitrate: 4000000 };
 }
-
 function drawImageCover(targetCtx, img, width, height) {
   var imgRatio = img.width / img.height;
   var canvasRatio = width / height;
@@ -546,7 +508,6 @@ function drawImageCover(targetCtx, img, width, height) {
   }
   targetCtx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
 }
-
 function drawFrame(targetCtx, width, height, frame, alpha) {
   targetCtx.globalAlpha = alpha;
   if (frame.imageObj) {
@@ -573,7 +534,6 @@ function drawFrame(targetCtx, width, height, frame, alpha) {
   }
   targetCtx.globalAlpha = 1;
 }
-
 function drawAtTime(targetCtx, width, height, time) {
   var elapsed = 0;
   for (var i = 0; i < frames.length; i++) {
@@ -598,17 +558,14 @@ function drawAtTime(targetCtx, width, height, time) {
   }
   drawFrame(targetCtx, width, height, frames[frames.length - 1], 1);
 }
-
 function totalDuration() {
   var total = 0;
   for (var i = 0; i < frames.length; i++) total += frames[i].duration;
   return total;
 }
-
 var previewPlaying = false;
 var previewAudio = null;
 var previewFrameId = null;
-
 function stopPreview() {
   if (previewFrameId !== null) {
     cancelAnimationFrame(previewFrameId);
@@ -621,17 +578,14 @@ function stopPreview() {
   }
   previewPlaying = false;
 }
-
 function showFrameLive(index) {
   stopPreview();
   drawFrame(ctx, canvas.width, canvas.height, frames[index], 1);
 }
-
 function playPreview() {
-  if (previewPlaying) return;
+  stopPreview();
   previewPlaying = true;
   var duration = totalDuration();
-
   if (activeAudioBlob) {
     previewAudio = new Audio(URL.createObjectURL(activeAudioBlob));
     previewAudio.currentTime = 0;
@@ -639,7 +593,6 @@ function playPreview() {
   } else {
     previewAudio = null;
   }
-
   var startTime = performance.now();
   function step(now) {
     var elapsed = previewAudio ? previewAudio.currentTime : (now - startTime) / 1000;
@@ -658,16 +611,13 @@ function playPreview() {
   }
   previewFrameId = requestAnimationFrame(step);
 }
-
 function exportVideo() {
   var status = document.getElementById('status');
   status.textContent = '';
-
   if (typeof MediaRecorder === 'undefined') {
     status.textContent = 'export failed: this browser does not support video processing';
     return;
   }
-
   var mimeType = 'video/webm;codecs=vp9,opus';
   if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'video/webm;codecs=vp8,opus';
   if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'video/webm';
@@ -675,14 +625,12 @@ function exportVideo() {
     status.textContent = 'export failed: no supported video format in this browser';
     return;
   }
-
   var quality = document.getElementById('qualitySelect').value;
   var dims = getExportDimensions(quality, aspectRatio);
   var exportCanvas = document.createElement('canvas');
   exportCanvas.width = dims.width;
   exportCanvas.height = dims.height;
   var exportCtx = exportCanvas.getContext('2d');
-
   var stream;
   try {
     stream = exportCanvas.captureStream(30);
@@ -690,7 +638,6 @@ function exportVideo() {
     status.textContent = 'export failed: ' + error.message;
     return;
   }
-
   function startexporting(finalStream) {
     var recorder;
     try {
@@ -711,12 +658,10 @@ function exportVideo() {
       link.click();
       status.textContent = 'done, video downloaded';
     };
-
     var duration = totalDuration();
     var startTime = performance.now();
     recorder.start();
     status.textContent = 'exporting...';
-
     function step(now) {
       var elapsed = (now - startTime) / 1000;
       if (elapsed >= duration) {
@@ -728,7 +673,6 @@ function exportVideo() {
     }
     requestAnimationFrame(step);
   }
-
   if (activeAudioBlob) {
     var audioElement = new Audio(URL.createObjectURL(activeAudioBlob));
     var audioContext = new AudioContext();
@@ -744,7 +688,6 @@ function exportVideo() {
     startexporting(stream);
   }
 }
-
 renderFrameList();
 drawAtTime(ctx, canvas.width, canvas.height, 0);
 </script>
