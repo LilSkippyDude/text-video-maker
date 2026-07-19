@@ -661,7 +661,7 @@ function exportVideo() {
     var duration = totalDuration();
     var startTime = performance.now();
     recorder.start();
-    status.textContent = 'exporting...';
+    status.textContent = 'exporting... may take a minute, feel free to switch to other tabs.';
     function step(now) {
       var elapsed = (now - startTime) / 1000;
       if (elapsed >= duration) {
