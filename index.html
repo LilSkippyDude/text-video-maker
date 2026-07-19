@@ -234,43 +234,34 @@ function compressAudioLikeOldYoutube(file) {
     var decodeContext = new AudioContext();
     decodeContext.decodeAudioData(event.target.result, function(buffer) {
       decodeContext.close();
-      var targetRate = 22050;
-      var offlineContext = new OfflineAudioContext(1, Math.ceil(buffer.duration * targetRate), targetRate);
+var targetRate = 32000;
+var offlineContext = new OfflineAudioContext(1, Math.ceil(buffer.duration * targetRate), targetRate);
 
-      var source = offlineContext.createBufferSource();
-      source.buffer = buffer;
+var source = offlineContext.createBufferSource();
+source.buffer = buffer;
 
-      var highpass = offlineContext.createBiquadFilter();
-      highpass.type = 'highpass';
-      highpass.frequency.value = 130;
+var highpass = offlineContext.createBiquadFilter();
+highpass.type = "highpass";
+highpass.frequency.value = 90;
 
-      var lowpass = offlineContext.createBiquadFilter();
-      lowpass.type = 'lowpass';
-      lowpass.frequency.value = 7500;
-      lowpass.Q.value = 0.7;
+var lowpass = offlineContext.createBiquadFilter();
+lowpass.type = "lowpass";
+lowpass.frequency.value = 6800;
+lowpass.Q.value = 0.5;
 
-      var compressor = offlineContext.createDynamicsCompressor();
-      compressor.threshold.value = -26;
-      compressor.knee.value = 4;
-      compressor.ratio.value = 14;
-      compressor.attack.value = 0.003;
-      compressor.release.value = 0.15;
+var compressor = offlineContext.createDynamicsCompressor();
+compressor.threshold.value = -24;
+compressor.knee.value = 20;
+compressor.ratio.value = 4;
+compressor.attack.value = 0.01;
+compressor.release.value = 0.2;
 
-      var crusher = offlineContext.createWaveShaper();
-      var steps = 48;
-      var curve = new Float32Array(65536);
-      for (var c = 0; c < 65536; c++) {
-        var x = (c / 65535) * 2 - 1;
-        curve[c] = Math.round(x * steps) / steps;
-      }
-      crusher.curve = curve;
+source.connect(highpass);
+highpass.connect(lowpass);
+lowpass.connect(compressor);
+compressor.connect(offlineContext.destination);
 
-      source.connect(highpass);
-      highpass.connect(lowpass);
-      lowpass.connect(crusher);
-      crusher.connect(compressor);
-      compressor.connect(offlineContext.destination);
-      source.start(0);
+source.start();
 
       offlineContext.startRendering().then(function(renderedBuffer) {
         activeAudioBlob = bufferToWavBlob(renderedBuffer);
