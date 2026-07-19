@@ -210,7 +210,6 @@ var ctx = canvas.getContext('2d');
 var aspectRatio = '16:9';
 var dragSourceIndex = null;
 var activeAudioBlob = null;
-
 function handleAudioUpload(event) {
   var file = event.target.files[0];
   if (!file) {
@@ -222,7 +221,6 @@ function handleAudioUpload(event) {
     compressAudioLikeOldYoutube(file);
   }
 }
-
 function compressAudioLikeOldYoutube(file) {
   var status = document.getElementById('status');
   status.textContent = 'compressing audio...';
@@ -263,7 +261,6 @@ function compressAudioLikeOldYoutube(file) {
   };
   reader.readAsArrayBuffer(file);
 }
-
 function bufferToWavBlob(buffer) {
   var numChannels = buffer.numberOfChannels;
   var sampleRate = buffer.sampleRate;
@@ -296,7 +293,6 @@ function bufferToWavBlob(buffer) {
   }
   return new Blob([arrayBuffer], { type: 'audio/wav' });
 }
-
 function renderFrameList() {
   frameList.innerHTML = '';
   for (var i = 0; i < frames.length; i++) {
@@ -459,7 +455,6 @@ function renderFrameList() {
     frameList.appendChild(row);
   }
 }
-
 function loadImageFile(file, index) {
   var reader = new FileReader();
   reader.onload = function(event) {
@@ -474,12 +469,10 @@ function loadImageFile(file, index) {
   };
   reader.readAsDataURL(file);
 }
-
 function addFrame() {
   frames.push({ text: "new text", duration: 5, size: 40, fade: 1.25, image: null, imageObj: null });
   renderFrameList();
 }
-
 function setAspect(ratio) {
   aspectRatio = ratio;
   canvas.height = ratio === '16:9' ? 360 : 480;
@@ -488,7 +481,6 @@ function setAspect(ratio) {
   document.getElementById('aspect43').className = ratio === '4:3' ? 'active' : '';
   drawAtTime(ctx, canvas.width, canvas.height, 0);
 }
-
 function getExportDimensions(quality, ratio) {
   if (ratio === '16:9') {
     if (quality === '480p') return { width: 854, height: 480, bitrate: 2500000 };
@@ -499,7 +491,6 @@ function getExportDimensions(quality, ratio) {
   if (quality === '1080p') return { width: 1440, height: 1080, bitrate: 7000000 };
   return { width: 960, height: 720, bitrate: 4000000 };
 }
-
 function drawImageCover(targetCtx, img, width, height) {
   var imgRatio = img.width / img.height;
   var canvasRatio = width / height;
@@ -517,7 +508,6 @@ function drawImageCover(targetCtx, img, width, height) {
   }
   targetCtx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
 }
-
 function drawFrame(targetCtx, width, height, frame, alpha) {
   targetCtx.globalAlpha = alpha;
   if (frame.imageObj) {
@@ -544,7 +534,6 @@ function drawFrame(targetCtx, width, height, frame, alpha) {
   }
   targetCtx.globalAlpha = 1;
 }
-
 function drawAtTime(targetCtx, width, height, time) {
   var elapsed = 0;
   for (var i = 0; i < frames.length; i++) {
@@ -569,17 +558,14 @@ function drawAtTime(targetCtx, width, height, time) {
   }
   drawFrame(targetCtx, width, height, frames[frames.length - 1], 1);
 }
-
 function totalDuration() {
   var total = 0;
   for (var i = 0; i < frames.length; i++) total += frames[i].duration;
   return total;
 }
-
 var previewPlaying = false;
 var previewAudio = null;
 var previewFrameId = null;
-
 function stopPreview() {
   if (previewFrameId !== null) {
     cancelAnimationFrame(previewFrameId);
@@ -592,12 +578,10 @@ function stopPreview() {
   }
   previewPlaying = false;
 }
-
 function showFrameLive(index) {
   stopPreview();
   drawFrame(ctx, canvas.width, canvas.height, frames[index], 1);
 }
-
 function playPreview() {
   stopPreview();
   previewPlaying = true;
@@ -627,7 +611,6 @@ function playPreview() {
   }
   previewFrameId = requestAnimationFrame(step);
 }
-
 function exportVideo() {
   var status = document.getElementById('status');
   status.textContent = '';
@@ -657,7 +640,7 @@ function exportVideo() {
   }
   var recorder;
   try {
-    recorder = new MediaRecorder(stream, { mimeType: mimeType, videoBitsPerSecond: dims.bitrate });
+    recorder = new MediaRecorder(stream, { mimeType: mimeType });
   } catch (error) {
     status.textContent = 'Export failed: ' + error.message;
     return;
@@ -700,7 +683,6 @@ function exportVideo() {
     setTimeout(() => { if (audioElement) audioElement.pause(); }, duration * 1000 + 500);
   }
 }
-
 renderFrameList();
 drawAtTime(ctx, canvas.width, canvas.height, 0);
 </script>
